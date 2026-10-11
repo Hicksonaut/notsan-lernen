@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="de"><head><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/icon-180.png"><link rel="icon" type="image/png" href="icons/icon-192.png"><meta name="theme-color" content="#0a6a8f"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light dark">
+<title>P-Algorithmen Abdecken</title>
+<style>
+/* Layout: feste Kopfzeile mit Werkzeugen, darunter die Original-Seite als Bild in einer scrollbaren Fläche; Abdeckungen liegen als Schaltflächen über jedem Kasten. */
+:root{
+  --bg:#e8edf0; --surface:#ffffff; --ink:#10222e; --ink2:#4b6070; --line:#c3cfd7; --line-strong:#6d8190;
+  --accent:#0a6a8f; --accent-ink:#ffffff; --stage:#cdd6dc;
+  --cv:#586f7f; --cv-line:#34495a; --cv-stripe:rgba(255,255,255,.14); --cv-ink:#ffffff;
+  --f-display:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  --f-body:'Barlow',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b141a; --surface:#15222b; --ink:#e7eff4; --ink2:#9db1bd; --line:#2a3b47; --line-strong:#5d7686;
+    --accent:#56c1e8; --accent-ink:#04202c; --stage:#070d11;
+    --cv:#6e8798; --cv-line:#9fb6c4; --cv-stripe:rgba(0,0,0,.16); --cv-ink:#ffffff;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b141a; --surface:#15222b; --ink:#e7eff4; --ink2:#9db1bd; --line:#2a3b47; --line-strong:#5d7686;
+  --accent:#56c1e8; --accent-ink:#04202c; --stage:#070d11;
+  --cv:#6e8798; --cv-line:#9fb6c4; --cv-stripe:rgba(0,0,0,.16); --cv-ink:#ffffff;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.4 var(--f-body);-webkit-text-size-adjust:100%;overflow:hidden}
+#app{height:100%;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.hd{flex:none;background:var(--surface);border-bottom:1px solid var(--line)}
+.hd .in{padding:8px 16px;display:flex;flex-direction:column;gap:8px}
+.r1{display:flex;align-items:center;gap:10px;min-width:0}
+.ib{flex:none;display:grid;place-items:center;min-width:42px;height:42px;padding:0 10px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);font:600 15px/1 var(--f-body);text-decoration:none}
+.ib[disabled]{opacity:.35;cursor:default}
+.ttl{flex:1;min-width:0;display:flex;align-items:baseline;gap:10px}
+.ttl .code{font:700 28px/1 var(--f-display);color:var(--accent);flex:none}
+.ttl h1{margin:0;font:600 18px/1.1 var(--f-display);letter-spacing:.01em;text-wrap:balance;min-width:0}
+.r2{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;align-items:center}
+.r2::-webkit-scrollbar{display:none}
+.tb{flex:none;height:38px;padding:0 12px;border-radius:9px;border:1px solid var(--line-strong);background:var(--surface);font:600 14px/1 var(--f-body);white-space:nowrap}
+.tb.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tb[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.zoom{flex:none;display:flex;align-items:center;border:1px solid var(--line-strong);border-radius:9px;overflow:hidden}
+.zoom button{height:36px;width:38px;border:0;background:var(--surface);font:600 20px/1 var(--f-body)}
+.zoom span{min-width:52px;text-align:center;font:600 13px/1 var(--f-body);color:var(--ink2);background:var(--surface);height:36px;display:grid;place-items:center;border-inline:1px solid var(--line)}
+.cnt{flex:none;font:600 13px/1 var(--f-body);color:var(--ink2);padding:0 6px;white-space:nowrap}
+
+.stage{flex:1;min-height:0;overflow:auto;background:var(--stage);-webkit-overflow-scrolling:touch}
+.pg{position:relative;margin:0 auto;width:calc(var(--z,1)*100%);background:#fff;line-height:0;user-select:none;-webkit-user-select:none}
+.pg img{display:block;width:100%;height:auto;-webkit-user-drag:none;pointer-events:none}
+.cv{position:absolute;margin:0;padding:0;border:0;background:var(--cv);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .12s}
+.cv.r{border:1px solid var(--cv-line);border-radius:3px}
+.cv.d{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.cv::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,var(--cv-stripe) 0 6px,transparent 6px 12px)}
+.cv::after{content:"";position:absolute;left:50%;top:50%;width:min(22px,60%);aspect-ratio:1;max-height:60%;transform:translate(-50%,-50%);background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1.5 12S5.5 5 12 5s10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");opacity:.9}
+.cv.open{opacity:0;pointer-events:auto;background:transparent}
+.cv.open::before,.cv.open::after{display:none}
+.cv.open.r{border-color:transparent}
+.cv.open:hover{opacity:1;background:transparent;outline:2px dashed var(--accent);outline-offset:-2px}
+.colors .cv:not(.open){background:var(--c)}
+.colors .cv:not(.open)::before{background:repeating-linear-gradient(135deg,rgba(255,255,255,.22) 0 6px,transparent 6px 12px)}
+.colors .cv:not(.open)::after{filter:drop-shadow(0 0 1px rgba(0,0,0,.7))}
+.colors .cv.light:not(.open)::after{filter:invert(1)}
+.colors .cv.light:not(.open)::before{background:repeating-linear-gradient(135deg,rgba(0,0,0,.07) 0 6px,transparent 6px 12px)}
+
+.home{max-width:760px;margin:0 auto;padding:18px 16px 40px}
+.home h1{font:700 clamp(36px,10vw,52px)/.95 var(--f-display);margin:0 0 8px;text-wrap:balance}
+.home p{margin:0;color:var(--ink2);max-width:54ch}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px;margin:18px 0 0;padding:0;list-style:none}
+.card{display:grid;grid-template-columns:76px 1fr;gap:12px;align-items:center;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
+.card:hover{border-color:var(--accent)}
+.card .code{font:700 30px/1 var(--f-display);color:var(--accent)}
+.card b{font:600 18px/1.15 var(--f-display);letter-spacing:.01em;text-wrap:balance}
+.foot{margin-top:22px;color:var(--ink2);font-size:13px;max-width:62ch}
+.how{margin-top:14px;display:grid;gap:6px;color:var(--ink2);font-size:14.5px}
+.how b{color:var(--ink)}
+.back{display:inline-flex;align-items:center;min-height:44px;margin:-6px 0 6px;padding:0 4px;font:600 15px/1 var(--f-body);color:var(--accent);text-decoration:none}
+.back:active{opacity:.6}
+</style>
+<div id="app"></div>
+<script>
+const PAGES=[{"id":"P1","code":"P 1","title":"Intraossärer Zugang (Reanimation)","img":"img/p-algorithmen/P1.webp","ar":0.70667,"b":[[8.71,9.73,30.54,4.0,"r","#dae8fc"],[41.68,9.73,16.97,4.0,"r","#ffffff"],[72.3,9.73,14.7,7.19,"r","#dae8fc"],[34.44,14.93,25.45,2.8,"r","#dae8fc"],[14.08,15.33,19.8,2.4,"r","#f0a30a"],[34.44,20.44,25.45,2.8,"r","#dae8fc"],[14.08,20.64,19.8,2.4,"r","#f0a30a"],[14.08,25.4,19.8,4.0,"r","#f0a30a"],[14.08,30.99,19.8,4.0,"r","#f0a30a"],[14.08,36.51,19.8,4.0,"r","#f0a30a"],[14.08,41.47,19.8,4.0,"r","#f0a30a"],[14.08,46.02,19.8,7.19,"r","#f0a30a"],[14.08,54.09,19.8,3.12,"r","#f0a30a"],[34.44,54.61,26.58,2.08,"r","#dae8fc"],[14.08,58.33,19.8,4.8,"r","#f0a30a"],[34.44,63.05,26.58,6.39,"r","#dae8fc"],[14.08,63.85,19.8,4.8,"r","#f0a30a"],[14.08,70.16,19.8,3.2,"r","#f0a30a"],[14.08,74.96,19.8,4.8,"r","#f0a30a"],[34.44,75.96,26.58,2.8,"r","#dae8fc"],[14.08,80.87,19.8,4.0,"r","#f0a30a"],[34.44,81.47,26.58,2.8,"r","#dae8fc"]]},{"id":"P2","code":"P 2","title":"CPAP-Anwendung","img":"img/p-algorithmen/P2.webp","ar":0.70667,"b":[[10.12,9.73,33.93,3.6,"r","#dae8fc"],[15.78,15.73,22.62,4.0,"d","#ffffff"],[50.16,16.93,45.25,4.4,"r","#dae8fc"],[15.78,22.92,22.62,4.0,"d","#ffffff"],[50.16,23.32,45.25,5.6,"r","#dae8fc"],[13.23,29.71,27.71,4.8,"r","#ffffff"],[50.16,31.31,45.25,5.6,"r","#dae8fc"],[15.78,37.31,22.62,4.8,"d","#ffffff"],[50.16,39.31,45.25,5.6,"r","#dae8fc"],[14.86,44.5,24.46,5.6,"r","#f0a30a"],[50.16,47.3,45.25,5.6,"r","#dae8fc"],[15.78,52.9,22.62,4.0,"d","#ffffff"],[50.16,55.29,45.25,7.19,"r","#dae8fc"],[16.91,60.09,20.36,3.2,"r","#f0a30a"],[50.16,64.89,45.25,7.99,"r","#dae8fc"],[12.6,67.28,28.99,4.0,"r","#dae8fc"]]},{"id":"P3","code":"P 3","title":"Extraglottischer Atemweg","img":"img/p-algorithmen/P3.webp","ar":0.70667,"b":[[15.78,9.73,13.57,2.4,"r","#dae8fc"],[57.63,12.93,32.8,4.0,"r","#dae8fc"],[12.67,14.53,19.8,4.0,"d","#ffffff"],[57.63,17.72,32.8,4.0,"r","#dae8fc"],[15.78,21.72,13.57,2.4,"r","#ffffff"],[57.63,22.52,32.8,4.0,"r","#dae8fc"],[11.25,27.32,22.62,4.0,"d","#ffffff"],[57.63,27.32,32.8,5.6,"r","#dae8fc"],[41.79,27.72,7.92,3.2,"r","#ffffff"],[57.63,33.71,32.8,4.0,"r","#dae8fc"],[15.78,35.31,13.57,2.4,"r","#ffffff"],[57.63,39.31,32.8,7.19,"r","#dae8fc"],[10.97,40.91,23.19,4.0,"d","#ffffff"],[57.63,48.1,32.8,4.0,"r","#dae8fc"],[16.2,49.7,12.44,3.2,"r","#ffffff"],[38.4,49.7,10.18,3.2,"r","#ffffff"],[57.63,52.9,32.8,4.0,"r","#dae8fc"],[10.97,56.89,22.91,4.0,"d","#ffffff"],[57.63,57.69,32.8,4.0,"r","#dae8fc"],[57.63,65.29,32.8,4.0,"r","#dae8fc"],[15.78,65.69,13.57,3.2,"r","#ffffff"],[8.42,72.08,28.28,4.0,"r","#dae8fc"]]},{"id":"P4","code":"P 4","title":"Thoraxentlastungspunktion (Reanimation)","img":"img/p-algorithmen/P4.webp","ar":0.70667,"b":[[71.43,10.91,18.43,6.62,"r","#ffffff"],[54.5,11.72,6.21,2.07,"r","#ffffff"],[53.43,15.76,8.43,2.32,"d","#ffffff"],[71.43,18.59,18.43,3.84,"r","#ffffff"],[54.43,20.61,6.29,2.53,"r","#ffffff"],[71.43,23.54,18.43,2.17,"r","#ffffff"],[64.36,24.14,4.5,3.13,"r","#ffffff"],[52.14,24.65,11.07,2.53,"d","#ffffff"],[71.43,25.71,18.43,1.97,"r","#ffffff"],[71.43,27.93,18.43,3.94,"r","#ffffff"],[54.43,28.69,6.29,2.47,"r","#ffffff"],[52.57,32.73,10.14,2.53,"d","#ffffff"],[71.43,32.88,18.43,2.32,"r","#ffffff"],[71.43,35.71,18.43,6.62,"r","#ffffff"],[13.57,37.27,22.14,6.06,"r","#6b6b6b"],[53.0,37.58,9.29,2.88,"r","#ffffff"],[46.43,41.36,7.57,2.78,"r","#ffffff"],[71.43,42.68,18.43,2.07,"r","#ffffff"],[53.0,45.96,9.29,2.42,"d","#ffffff"],[71.43,45.96,18.43,2.53,"r","#ffffff"],[71.43,48.84,18.43,6.16,"r","#ffffff"],[52.14,50.86,11.0,1.97,"r","#ffffff"],[54.5,54.95,6.21,1.92,"r","#ffffff"]]},{"id":"P5","code":"P 5","title":"Sauerstoffgabe","img":"img/p-algorithmen/P5.webp","ar":0.70667,"b":[[56.95,8.93,36.2,8.79,"r","#dae8fc"],[6.61,9.73,28.28,4.0,"r","#dae8fc"],[9.44,16.93,22.62,3.2,"d","#ffffff"],[56.95,18.52,36.2,9.59,"r","#dae8fc"],[4.97,25.72,31.56,5.6,"r","#ffffff"],[56.95,29.11,36.2,6.39,"r","#dae8fc"],[9.44,35.51,22.62,4.0,"d","#ffffff"],[67.29,37.78,25.79,10.1,"r","#a8c4f5"],[41.12,39.31,19.23,3.0,"r","#dae8fc"],[37.72,45.9,26.02,6.0,"d","#ffffff"],[9.44,46.9,22.62,4.0,"d","#ffffff"],[39.53,56.29,37.33,4.4,"r","#dae8fc"],[8.31,56.89,24.89,3.2,"r","#ffffff"],[7.18,64.09,27.15,4.8,"r","#ffffff"],[37.72,64.09,26.02,4.8,"r","#ffffff"],[67.92,64.09,25.56,4.8,"r","#ffffff"],[39.42,72.88,22.62,4.0,"d","#ffffff"],[72.22,72.88,16.97,4.0,"r","#dae8fc"],[68.26,80.07,24.89,5.6,"r","#e51400"],[8.99,80.87,27.15,4.0,"r","#dae8fc"]]}];
+(function(){
+var app=document.getElementById('app');
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var idx={};PAGES.forEach(function(p,i){idx[p.id]=i});
+var STEPS=[1,1.5,2,2.5,3,4];
+var KEY='p-algorithmen-abdecken-v1';
+var st={zi:null,colors:false};
+try{var raw=localStorage.getItem(KEY);if(raw){var o=JSON.parse(raw);if(typeof o.zi==='number')st.zi=o.zi;st.colors=!!o.colors}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+var open={};          // id -> {boxIndex:true}
+var cur=-1;
+
+function lum(hex){var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return (0.299*r+0.587*g+0.114*b)/255}
+
+/* ---------- Startseite ---------- */
+function home(){
+  cur=-1;document.title='P-Algorithmen Abdecken';
+  app.innerHTML='<div class="stage"><div class="home"><a class="back" href="./">&lsaquo; Startseite</a><h1>P-Algorithmen abdecken</h1>'+
+  '<p>Die Original-Seiten der P-Algorithmen (Maßnahmen und Verfahren) aus den Hessen-Algorithmen (V 4.2). Jeder Kasten ist abgedeckt. Du deckst auf, was du willst, in beliebiger Reihenfolge.</p>'+
+  '<div class="how"><span><b>Antippen</b> deckt einen Kasten auf, noch einmal antippen deckt ihn wieder ab.</span><span><b>Zoom</b> mit + und − oben, danach die Seite mit dem Finger verschieben.</span></div>'+
+  '<ul class="list">'+PAGES.map(function(p){
+    return '<li><a class="card" href="#'+p.id+'"><span class="code">'+esc(p.code)+'</span><b>'+esc(p.title)+'</b></a></li>'}).join('')+'</ul>'+
+  '<p class="foot">Quelle: „Algorithmen zur Notfallversorgung“, Lehrmeinung für die Notfallsanitäter-Ausbildung an den hessischen Rettungsdienstschulen, Version 4.2, Stand 04.12.2025. Die Seiten sind unverändert, nur die Kästen sind abgedeckt. Dies ist eine Lernhilfe, im Einsatz gelten das Original und die lokalen Vorgaben.</p></div></div>';
+}
+
+/* ---------- Seite ---------- */
+function zoomIndex(){
+  if(st.zi!=null)return st.zi;
+  return window.innerWidth<600?2:0;
+}
+function page(i){
+  cur=i;var p=PAGES[i];
+  document.title=p.code+' '+p.title+' · P-Algorithmen Abdecken';
+  if(!open[p.id])open[p.id]={};
+  var prev=i>0?PAGES[i-1]:null,next=i<PAGES.length-1?PAGES[i+1]:null;
+  if(next)(new Image()).src=next.img;
+  app.innerHTML=
+  '<div class="hd"><div class="in">'+
+  '<div class="r1"><a class="ib" href="#" aria-label="Zur Liste">☰</a>'+
+  '<div class="ttl"><span class="code">'+esc(p.code)+'</span><h1>'+esc(p.title)+'</h1></div>'+
+  (prev?'<a class="ib" href="#'+prev.id+'" aria-label="Vorheriger Algorithmus: '+esc(prev.code)+'">‹</a>':'<span class="ib" style="opacity:.3">‹</span>')+
+  (next?'<a class="ib" href="#'+next.id+'" aria-label="Nächster Algorithmus: '+esc(next.code)+'">›</a>':'<span class="ib" style="opacity:.3">›</span>')+'</div>'+
+  '<div class="r2"><span class="cnt" id="cnt"></span>'+
+  '<button class="tb pri" type="button" data-a="nextbox">Nächsten aufdecken</button>'+
+  '<button class="tb" type="button" data-a="cover">Alle abdecken</button>'+
+  '<button class="tb" type="button" data-a="uncover">Alle aufdecken</button>'+
+  '<div class="zoom"><button type="button" data-a="zout" aria-label="Verkleinern">−</button><span id="zv"></span><button type="button" data-a="zin" aria-label="Vergrößern">+</button></div>'+
+  '<button class="tb" type="button" data-a="colors" aria-pressed="'+st.colors+'">Farben zeigen</button>'+
+  '</div></div></div>'+
+  '<div class="stage" id="stage"><div class="pg'+(st.colors?' colors':'')+'" id="pg" style="--ar:'+p.ar+'"><img decoding="async" src="'+p.img+'" alt="'+esc(p.code+' '+p.title)+'" draggable="false">'+
+  p.b.map(function(b,k){
+    var shape=b[4]==='d'?'d':'r';
+    var pad=shape==='d'?'1.5px':'1px';
+    return '<button type="button" class="cv '+shape+(lum(b[5])>0.8?' light':'')+(open[p.id][k]?' open':'')+'" data-k="'+k+'" aria-label="Kasten '+(k+1)+' von '+p.b.length+(open[p.id][k]?', aufgedeckt':', abgedeckt')+'" style="--c:'+b[5]+';left:calc('+b[0]+'% - '+pad+');top:calc('+b[1]+'% - '+pad+');width:calc('+b[2]+'% + '+pad+' * 2);height:calc('+b[3]+'% + '+pad+' * 2)"></button>';
+  }).join('')+'</div></div>';
+  applyZoom(false);count();
+}
+function count(){
+  var p=PAGES[cur],n=p.b.length,o=Object.keys(open[p.id]).length;
+  var el=document.getElementById('cnt');if(el)el.textContent=o+' / '+n+' aufgedeckt';
+}
+function applyZoom(keep){
+  var stage=document.getElementById('stage'),pg=document.getElementById('pg');if(!stage)return;
+  var z=STEPS[zoomIndex()];
+  var cx=0,cy=0;
+  if(keep&&stage.scrollWidth&&stage.scrollHeight){cx=(stage.scrollLeft+stage.clientWidth/2)/stage.scrollWidth;cy=(stage.scrollTop+stage.clientHeight/2)/stage.scrollHeight}
+  pg.style.setProperty('--z',z);
+  document.getElementById('zv').textContent=Math.round(z*100)+' %';
+  if(keep){stage.scrollLeft=cx*stage.scrollWidth-stage.clientWidth/2;stage.scrollTop=cy*stage.scrollHeight-stage.clientHeight/2}
+}
+function setBox(k,on){
+  var p=PAGES[cur],el=document.querySelector('.cv[data-k="'+k+'"]');
+  if(on)open[p.id][k]=true;else delete open[p.id][k];
+  if(el){el.classList.toggle('open',on);el.setAttribute('aria-label','Kasten '+(+k+1)+' von '+p.b.length+(on?', aufgedeckt':', abgedeckt'))}
+}
+
+document.addEventListener('click',function(ev){
+  if(cur<0)return;
+  var t=ev.target.closest&&ev.target.closest('.cv,[data-a]');if(!t)return;
+  var p=PAGES[cur];
+  if(t.classList.contains('cv')){var k=+t.getAttribute('data-k');setBox(k,!open[p.id][k]);count();return}
+  var a=t.getAttribute('data-a');
+  if(a==='cover'){p.b.forEach(function(_,k){setBox(k,false)});count()}
+  else if(a==='uncover'){p.b.forEach(function(_,k){setBox(k,true)});count()}
+  else if(a==='nextbox'){
+    for(var k=0;k<p.b.length;k++){if(!open[p.id][k]){setBox(k,true);count();
+      var el=document.querySelector('.cv[data-k="'+k+'"]');
+      if(el)el.scrollIntoView({block:'center',inline:'center',behavior:'smooth'});break}}
+  }
+  else if(a==='zin'){st.zi=Math.min(STEPS.length-1,zoomIndex()+1);save();applyZoom(true)}
+  else if(a==='zout'){st.zi=Math.max(0,zoomIndex()-1);save();applyZoom(true)}
+  else if(a==='colors'){st.colors=!st.colors;save();t.setAttribute('aria-pressed',st.colors);document.getElementById('pg').classList.toggle('colors',st.colors)}
+});
+document.addEventListener('keydown',function(ev){
+  if(cur<0||ev.target.tagName==='INPUT')return;
+  if(ev.key==='ArrowRight'&&cur<PAGES.length-1)location.hash='#'+PAGES[cur+1].id;
+  if(ev.key==='ArrowLeft'&&cur>0)location.hash='#'+PAGES[cur-1].id;
+});
+function route(){
+  var h='';try{h=decodeURIComponent(location.hash.slice(1))}catch(e){}
+  if(idx[h]!=null)page(idx[h]);else home();
+}
+window.addEventListener('hashchange',route);
+route();
+})();
+
+</script>
+<script>if('serviceWorker' in navigator)addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})</script>
+</html>

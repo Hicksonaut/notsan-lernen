@@ -7,7 +7,7 @@ import hashlib, json, os
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(root)
 
-shell = ['./', 'index.html', 'anleitung.html', 'algorithmen.html', 'medikamente.html', 'manifest.webmanifest']
+shell = ['./', 'index.html', 'anleitung.html', 'algorithmen.html', 'p-algorithmen.html', 'medikamente.html', 'manifest.webmanifest']
 shell += sorted('icons/' + f for f in os.listdir('icons') if f.endswith('.png'))
 
 images, total = [], 0

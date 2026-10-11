@@ -3,7 +3,8 @@
 Einfache Lern-Apps zum Abdecken und Abfragen für die Ausbildung im Rettungsdienst (Hessen).
 
 - `index.html` – Startseite
-- `algorithmen.html` – Algorithmen abdecken
+- `algorithmen.html` – Basis- und K-Algorithmen abdecken
+- `p-algorithmen.html` – P-Algorithmen (Maßnahmen und Verfahren) abdecken
 - `medikamente.html` – Medikamente abdecken
 
 Reine statische Dateien, kein Build nötig. Gehostet über GitHub Pages.
