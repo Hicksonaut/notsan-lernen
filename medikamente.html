@@ -84,6 +84,8 @@ a{color:inherit}
 .card .tg{display:inline-block;margin-left:8px;font:600 11px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);border:1px solid var(--line-strong);border-radius:99px;padding:3px 7px;vertical-align:middle}
 .how{margin-top:14px;display:grid;gap:6px;color:var(--ink2);font-size:14.5px}
 .how b{color:var(--ink)}
+.back{display:inline-flex;align-items:center;min-height:44px;margin:-6px 0 6px;padding:0 4px;font:600 15px/1 var(--f-body);color:var(--accent);text-decoration:none}
+.back:active{opacity:.6}
 </style>
 <div id="app"></div>
 <script>
@@ -116,7 +118,7 @@ function renderList(){
 }
 function home(){
   cur=-1;document.title='Medikamente Abdecken';
-  app.innerHTML='<div class="stage"><div class="home"><h1>Medikamente abdecken</h1>'+
+  app.innerHTML='<div class="stage"><div class="home"><a class="back" href="./">&lsaquo; Startseite</a><h1>Medikamente abdecken</h1>'+
   '<p>Die Original-Seiten der Medikamenten-Sheets (V 4.2). Überschrift und Begriffe links bleiben sichtbar. Die Texte rechts sind pro Kategorie abgedeckt, bei den Algorithmen und Tabellen jeder Kasten und jede Zelle.</p>'+
   '<div class="how"><span><b>Antippen</b> deckt auf, noch einmal antippen deckt wieder ab. Die Reihenfolge ist frei.</span><span><b>Zoom</b> mit + und − oben, danach die Seite mit dem Finger verschieben.</span></div>'+
   '<input id="q" class="search" type="search" placeholder="Suchen, z. B. Atropin oder M 13" autocomplete="off" value="'+esc(query)+'" aria-label="Medikament suchen">'+
