@@ -29,6 +29,14 @@ h1{font-size:1.6rem;margin:24px 0 4px}
 .go{display:inline-block;margin-top:14px;background:var(--accent);color:var(--accent-ink);
   padding:8px 16px;border-radius:999px;font-weight:600;font-size:.9rem}
 .hint{margin-top:28px;font-size:.85rem;color:var(--ink2)}
+main{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding-bottom:max(14px,env(safe-area-inset-bottom))}
+.bottom{margin-top:auto;padding-top:24px}
+.bottom .hint{margin:0 0 10px}
+.install{display:flex;align-items:center;justify-content:space-between;gap:12px;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.install .t{display:flex;flex-direction:column;min-width:0}
+.install b{font-size:.95rem;color:var(--accent)}
+.install small{color:var(--ink2);font-size:.8rem}
+.install .go{margin:0;padding:6px 14px;font-size:.85rem;flex:none}
 </style>
 </head>
 <body>
@@ -48,13 +56,13 @@ h1{font-size:1.6rem;margin:24px 0 4px}
     <span class="go">Öffnen</span>
   </a>
 
-  <a class="card" href="anleitung.html">
-    <h2>Als App installieren</h2>
-    <p>Schritt-für-Schritt-Anleitung mit Bildern für iPhone und Android.</p>
-    <span class="go">Anleitung ansehen</span>
-  </a>
-
-  <p class="hint">Der Lernstand wird lokal auf dem jeweiligen Gerät gespeichert.</p>
+  <div class="bottom">
+    <p class="hint">Der Lernstand wird lokal auf dem jeweiligen Gerät gespeichert.</p>
+    <a class="install" href="anleitung.html">
+      <span class="t"><b>Als App installieren</b><small>Anleitung für iPhone und Android</small></span>
+      <span class="go">Ansehen</span>
+    </a>
+  </div>
 </main>
 </body>
 </html>
