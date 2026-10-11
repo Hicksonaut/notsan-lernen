@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-title" content="NotSan Lernen">
+<title>NotSan Lernen</title>
+<style>
+:root{
+  --bg:#e8edf0; --surface:#ffffff; --ink:#10222e; --ink2:#4b6070; --line:#c3cfd7;
+  --accent:#0a6a8f; --accent-ink:#ffffff;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#0f1a21; --surface:#18262f; --ink:#e6eef3; --ink2:#9db0bd; --line:#2c404c; --accent:#4fb3d9; --accent-ink:#06222e; }
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+main{max-width:640px;margin:0 auto;padding:max(24px,env(safe-area-inset-top)) 16px 40px}
+h1{font-size:1.6rem;margin:24px 0 4px}
+.sub{color:var(--ink2);margin:0 0 28px}
+.card{display:block;text-decoration:none;color:inherit;background:var(--surface);
+  border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px}
+.card:active{border-color:var(--accent)}
+.card h2{margin:0 0 6px;font-size:1.2rem;color:var(--accent)}
+.card p{margin:0;color:var(--ink2);font-size:.95rem}
+.go{display:inline-block;margin-top:14px;background:var(--accent);color:var(--accent-ink);
+  padding:8px 16px;border-radius:999px;font-weight:600;font-size:.9rem}
+.hint{margin-top:28px;font-size:.85rem;color:var(--ink2)}
+</style>
+</head>
+<body>
+<main>
+  <h1>NotSan Lernen</h1>
+  <p class="sub">Lernhilfen zum Abdecken und Abfragen für die Ausbildung im Rettungsdienst.</p>
+
+  <a class="card" href="algorithmen.html">
+    <h2>Algorithmen</h2>
+    <p>Algorithmen abdecken und aufdecken, um die Schritte aktiv abzurufen.</p>
+    <span class="go">Öffnen</span>
+  </a>
+
+  <a class="card" href="medikamente.html">
+    <h2>Medikamente</h2>
+    <p>Medikamentenlisten abdecken und aufdecken, um Wirkstoffe und Angaben zu lernen.</p>
+    <span class="go">Öffnen</span>
+  </a>
+
+  <p class="hint">Tipp für das iPhone: In Safari auf Teilen tippen und „Zum Home-Bildschirm" wählen. Der Lernstand wird lokal auf dem Gerät gespeichert.</p>
+</main>
+</body>
+</html>
