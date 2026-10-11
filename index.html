@@ -37,6 +37,18 @@ main{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;paddi
 .install b{font-size:.95rem;color:var(--accent)}
 .install small{color:var(--ink2);font-size:.8rem}
 .install .go{margin:0;padding:6px 14px;font-size:.85rem;flex:none}
+.offline{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
+.offline[hidden]{display:none}
+.offline .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.offline .t{display:flex;flex-direction:column;min-width:0}
+.offline b{font-size:.95rem;color:var(--accent)}
+.offline small{color:var(--ink2);font-size:.8rem}
+.offline button{flex:none;font:600 .85rem/1 inherit;font-family:inherit;border:0;border-radius:999px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.offline button.ghost{background:transparent;color:var(--ink2);border:1px solid var(--line)}
+.offline button[disabled]{opacity:.5}
+.offline .bar{height:4px;border-radius:2px;background:var(--line);margin-top:8px;overflow:hidden}
+.offline .bar[hidden]{display:none}
+.offline .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
 </style>
 </head>
 <body>
@@ -58,11 +70,64 @@ main{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;paddi
 
   <div class="bottom">
     <p class="hint">Der Lernstand wird lokal auf dem jeweiligen Gerät gespeichert.</p>
+    <div class="offline" id="offline" hidden>
+      <div class="row">
+        <span class="t"><b id="offTitle">Offline nutzen</b><small id="offSub">Alle Seiten auf das Gerät laden</small></span>
+        <button type="button" id="offBtn">Laden</button>
+      </div>
+      <div class="bar" id="offBar" hidden><i id="offFill"></i></div>
+    </div>
     <a class="install" href="anleitung.html">
       <span class="t"><b>Als App installieren</b><small>Anleitung für iPhone und Android</small></span>
       <span class="go">Ansehen</span>
     </a>
   </div>
 </main>
+<script>
+(function(){
+  if(!('serviceWorker' in navigator)||!window.caches)return;
+  var row=document.getElementById('offline'),btn=document.getElementById('offBtn'),
+      ttl=document.getElementById('offTitle'),sub=document.getElementById('offSub'),
+      bar=document.getElementById('offBar'),fill=document.getElementById('offFill');
+  var mode='idle',busy=false,last=null;
+  function mb(b){return (b/1048576).toFixed(1).replace('.',',')+' MB'}
+  function show(s){
+    last=s;row.hidden=false;busy=false;btn.disabled=false;bar.hidden=true;
+    if(s.total&&s.cached>=s.total){
+      mode='done';ttl.textContent='Offline verfügbar';sub.textContent='Alle '+s.total+' Seiten sind auf diesem Gerät gespeichert';
+      btn.textContent='Entfernen';btn.className='ghost';
+    }else if(s.optin){
+      mode='resume';ttl.textContent='Offline unvollständig';sub.textContent=s.cached+' von '+s.total+' geladen. Verbindung nötig zum Fortsetzen.';
+      btn.textContent='Fortsetzen';btn.className='';
+    }else{
+      mode='idle';ttl.textContent='Offline nutzen';sub.textContent='Alle Seiten laden, ca. '+mb(s.bytes)+' (WLAN empfohlen)';
+      btn.textContent='Laden';btn.className='';
+    }
+  }
+  function progress(m){
+    busy=true;btn.disabled=true;bar.hidden=false;
+    ttl.textContent='Lade Seiten …';sub.textContent=m.done+' von '+m.total;
+    fill.style.width=(m.total?m.done/m.total*100:0)+'%';
+  }
+  function send(msg){navigator.serviceWorker.ready.then(function(r){if(r.active)r.active.postMessage(msg)})}
+  navigator.serviceWorker.addEventListener('message',function(ev){
+    var m=ev.data||{};
+    if(m.type==='status')show(m);
+    else if(m.type==='progress'){row.hidden=false;progress(m)}
+  });
+  btn.addEventListener('click',function(){
+    if(busy)return;
+    if(mode==='done'){if(confirm('Offline-Daten von diesem Gerät entfernen?'))send({type:'clear'});return}
+    try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+    progress({done:last?last.cached:0,total:last?last.total:0});
+    send({type:'download'});
+  });
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('sw.js').then(function(){return navigator.serviceWorker.ready}).then(function(r){
+      if(r.active)r.active.postMessage({type:'status'});
+    }).catch(function(){});
+  });
+})();
+</script>
 </body>
 </html>
